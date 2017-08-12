@@ -3,7 +3,6 @@
 import discord
 import asyncio
 import logging
-import logutil
 import os
 import argparse
 import contextlib
@@ -12,12 +11,11 @@ import sqlite3
 import datetime
 import tldextract
 import aiohttp
-import banner
 import yaml
 import functools
-import constants
 import humanize
 import concurrent
+from . import logutil, constants, banner
 from urllib.parse import urlparse, urljoin
 from collections import namedtuple, deque
 
@@ -130,7 +128,7 @@ async def get_class_info(school_id=None, crn=None, term=None, session=None,
                                      seats_updated_seconds_ago))
     except (StopIteration, ValueError):
         banner_url, = next(db.execute(constants.SQL_GET_SCHOOL_URL,
-                                      (school_id,)))        
+                                      (school_id,)))
         class_info = await banner.get_class_info(banner_url, crn, term=term,
                                                  session=session)
         if class_info is None:
@@ -205,7 +203,7 @@ class Conversation:
             self.user_id = db.execute(constants.SQL_ADD_USER,
                                       (self.author.id, type(self).HELLO)
                                       ).lastrowid
-        await self.reply(constants.USER_MSG_HELLO, self.author.mention)
+        await self.reply(constants.USER_MSG_INTRODUCTION, self.author.mention)
         return type(self).SCHOOL_NAME_REQUEST
 
     async def check_reset(self):
@@ -237,6 +235,10 @@ class Conversation:
         match = constants.CMD_HELP.match(self.msg_content)
         if match:
             await self.reply(constants.USER_MSG_HELP)
+            return
+        match = constants.CMD_DISCLAIMER.match(self.msg_content)
+        if match:
+            await self.reply(constants.USER_MSG_DISCLAIMER)
             return
         match = constants.CMD_CLASS_INFO.match(self.msg_content)
         if match:
