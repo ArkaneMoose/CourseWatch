@@ -250,10 +250,11 @@ USER_MSG_HELP = unwrap('''
     This bot was developed by Rishov Sarkar. Contact him if you have any
     questions, comments, or concerns.
     ''')
-USER_MSG_NOTIFICATION = unwrap('''
+USER_MSG_NOTIFICATION_SUMMARY = unwrap('''
     {id!s} {section!s}: {seat_rem!s}/{seat_cap!s}
-    seat{seat_cap_plural!s} available \u2022
-
+    seat{seat_cap_plural!s} available
+    ''')
+USER_MSG_NOTIFICATION_DESCRIPTION = unwrap('''
     **{id!s} {section!s}** *{name!s}* (CRN {crn!s:0>5}, {human_term!s})
     now has **{seat_rem!s} available seat{seat_rem_plural!s}** out of a
     total of {seat_cap!s} seat{seat_cap_plural!s}.

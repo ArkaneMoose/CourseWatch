@@ -80,23 +80,27 @@ def get_human_readable_term(term):
     season = constants.BANNER_TERMS_BY_NUMBER.get(term % 100, '(invalid term)')
     return '{season!s} {year!s}'.format(season=season, year=year)
 
-async def send_pm(user_id, message):
+async def notify(user_id, summary, description=None):
     try:
         user = users[user_id]
     except KeyError:
         user = await client.get_user_info(user_id)
         users[user_id] = user
-    await client.send_message(user, message)
+    message = await client.send_message(user, summary)
+    if description is not None:
+        await client.edit_message(message, description)
 
 def dispatch_notifications(class_info):
     fmt_params = class_info._asdict()
     fmt_params['seat_rem_plural'] = '' if class_info.seat_rem == 1 else 's'
     fmt_params['seat_cap_plural'] = '' if class_info.seat_cap == 1 else 's'
     fmt_params['human_term'] = get_human_readable_term(class_info.term)
-    message = constants.USER_MSG_NOTIFICATION.format(**fmt_params)
+    summary = constants.USER_MSG_NOTIFICATION_SUMMARY.format(**fmt_params)
+    description = constants.USER_MSG_NOTIFICATION_DESCRIPTION.format(
+        **fmt_params)
     for user_id, in db.execute(constants.SQL_GET_USERS_TO_NOTIFY,
                                (class_info.db_id,)):
-        asyncio.ensure_future(send_pm(user_id, message))
+        asyncio.ensure_future(notify(user_id, summary, description))
 
 async def get_class_info(school_id=None, crn=None, term=None, session=None,
                          id_in_db=None, force_refresh=False):
