@@ -70,10 +70,11 @@ def get_default_term():
     year = now.year
     possible_terms = [datetime.datetime(year, month, 1, 0, 0, 0,
                                         tzinfo=datetime.timezone.utc)
-                      for month in (2, 5, 8)]
+                      for month in (2, 8)]
     possible_terms.append(datetime.datetime(year + 1, 2, 1, 0, 0, 0,
                                             tzinfo=datetime.timezone.utc))
-    term = min(possible_terms, key=lambda date: abs(date - now))
+    term = min(filter(lambda date: date >= now, possible_terms),
+               key=lambda date: date - now)
     return term.year * 100 + term.month
 
 async def get_class_info(base_url, crn, term=None, session=None):
