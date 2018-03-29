@@ -149,7 +149,7 @@ USER_MSG_WATCHLIST_EMPTY = unwrap('''
     ''')
 USER_MSG_WATCHLIST_ENTRY = unwrap('''
     **{id!s} {section!s}** *{name!s}* (CRN {crn!s:0>5}, {human_term!s}):
-    {seat_rem!s}/{seat_cap!s} seat{seat_cap_plural!s} available
+    {seat_rem!s} of {seat_cap!s} seat{seat_cap_plural!s} available
     ''')
 USER_MSG_INVALID_SCHOOL_WEBSITE = unwrap('''
     Hmmm, that doesn't seem like a valid website. I'm looking for
