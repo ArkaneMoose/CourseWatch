@@ -334,9 +334,9 @@ class Conversation:
                                   (self.user_id,)):
                 watchlist.append(constants.USER_MSG_WATCHLIST_ENTRY.format(
                     id=course_id, section=section, name=name, crn=crn,
-                    term=term, human_term=get_human_readable_term(term)),
+                    term=term, human_term=get_human_readable_term(term),
                     seat_cap=seat_cap, seat_rem=seat_rem,
-                    seat_cap_plural='' if seat_cap == 1 else 's')
+                    seat_cap_plural='' if seat_cap == 1 else 's'))
             if watchlist:
                 lines = deque(watchlist)
                 lines.appendleft(constants.USER_MSG_WATCHLIST.format(
