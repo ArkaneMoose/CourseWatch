@@ -31,6 +31,7 @@ ClassInfo = namedtuple('ClassInfo', ('db_id', 'name', 'term', 'crn', 'id',
                                      'seat_rem', 'wait_cap', 'wait_act',
                                      'wait_rem', 'seats_updated_seconds_ago'))
 
+
 class ConfigReader:
     def __init__(self, *args):
         self.config_srcs = args
@@ -51,6 +52,7 @@ class ConfigReader:
             raise ValueError("no value for required configuration option "
                              "{0!s}".format(repr(key)))
         return value
+
 
 def get_term_and_crn_from_match(match):
     get_group = match.group
@@ -75,10 +77,12 @@ def get_term_and_crn_from_match(match):
     season = next(filter(None, (get_group(i) for i in season_groups)))
     return year * 100 + constants.BANNER_TERMS_BY_NAME[season.lower()], crn
 
+
 def get_human_readable_term(term):
     year = term // 100
     season = constants.BANNER_TERMS_BY_NUMBER.get(term % 100, '(invalid term)')
     return '{season!s} {year!s}'.format(season=season, year=year)
+
 
 async def notify(user_id, summary, description=None):
     try:
@@ -89,6 +93,7 @@ async def notify(user_id, summary, description=None):
     message = await client.send_message(user, summary)
     if description is not None:
         await client.edit_message(message, description)
+
 
 def dispatch_notifications(class_info):
     fmt_params = class_info._asdict()
@@ -102,6 +107,7 @@ def dispatch_notifications(class_info):
                                (class_info.db_id,)):
         asyncio.ensure_future(notify(user_id, summary, description))
 
+
 async def get_class_info(school_id=None, crn=None, term=None, session=None,
                          id_in_db=None, force_refresh=False):
     if term is None:
@@ -111,14 +117,14 @@ async def get_class_info(school_id=None, crn=None, term=None, session=None,
     try:
         if id_in_db is None:
             id_in_db, name, course_id, section, seat_cap, seat_act, seat_rem, \
-                      wait_cap, wait_act, wait_rem, seats_updated_seconds_ago \
-                      = next(db.execute(constants.SQL_GET_SEATS_BY_CLASS_INFO,
-                                        (school_id, term, crn)))
+                wait_cap, wait_act, wait_rem, seats_updated_seconds_ago \
+                = next(db.execute(constants.SQL_GET_SEATS_BY_CLASS_INFO,
+                                  (school_id, term, crn)))
         else:
             school_id, crn, term, name, course_id, section, seat_cap, \
-                       seat_act, seat_rem, wait_cap, wait_act, wait_rem, \
-                       seats_updated_seconds_ago = next(db.execute(
-                           constants.SQL_GET_SEATS_BY_CLASS_ID, (id_in_db,)))
+                seat_act, seat_rem, wait_cap, wait_act, wait_rem, \
+                seats_updated_seconds_ago = next(db.execute(
+                    constants.SQL_GET_SEATS_BY_CLASS_ID, (id_in_db,)))
         cached_seat_rem = seat_rem
         if force_refresh:
             raise ValueError('forced refresh for school ID {0!s}, term {1!s}, '
@@ -138,14 +144,14 @@ async def get_class_info(school_id=None, crn=None, term=None, session=None,
         if class_info is None:
             return None
         name, _, course_id, section, seat_cap, seat_act, seat_rem, wait_cap, \
-              wait_act, wait_rem = class_info
+            wait_act, wait_rem = class_info
         seats_updated_seconds_ago = 0
         with db:
             if id_in_db is None:
                 id_in_db = db.execute(constants.SQL_CREATE_CLASS, (
                     school_id, term, crn, name, course_id, section, seat_cap,
                     seat_act, seat_rem, wait_cap, wait_act, wait_rem
-                    )).lastrowid
+                )).lastrowid
             else:
                 if seat_rem != cached_seat_rem:
                     notification_required = True
@@ -159,6 +165,7 @@ async def get_class_info(school_id=None, crn=None, term=None, session=None,
         dispatch_notifications(result)
     return result
 
+
 async def watch_iteration():
     logger.debug(constants.LOG_MSG_WATCHER_LOOP_ITERATION_START)
     async with aiohttp.ClientSession() as session:
@@ -171,10 +178,12 @@ async def watch_iteration():
         await asyncio.gather(*tasks, return_exceptions=True)
     logger.debug(constants.LOG_MSG_WATCHER_LOOP_ITERATION_END)
 
+
 async def watcher():
     while True:
         asyncio.ensure_future(watch_iteration())
         await asyncio.sleep(config.seat_data_max_age)
+
 
 class Conversation:
     NORMAL = 0
@@ -222,7 +231,7 @@ class Conversation:
             with db:
                 db.execute(
                     constants.SQL_RESET_USER_WATCHLIST, (self.user_id,)
-                    ).execute(constants.SQL_DELETE_USER, (self.user_id,))
+                ).execute(constants.SQL_DELETE_USER, (self.user_id,))
             self.user_id = None
             await self.reply(constants.USER_MSG_RESET_DONE)
             return type(self).HELLO
@@ -231,7 +240,8 @@ class Conversation:
             return self.state & ~type(self).RESET_CONFIRMATION
 
     async def normal_state(self):
-        if await self.check_reset(): return
+        if await self.check_reset():
+            return
         match = constants.CMD_HELLO.match(self.msg_content)
         if match:
             await self.reply(constants.USER_MSG_HELLO, self.author.mention)
@@ -339,7 +349,8 @@ class Conversation:
         await self.reply(constants.USER_MSG_INVALID_COMMAND)
 
     async def school_name_req_state(self):
-        if await self.check_reset(): return
+        if await self.check_reset():
+            return
         extract_result = tldextract.extract(self.msg_content)
         if not extract_result.suffix:
             await self.reply(constants.USER_MSG_INVALID_SCHOOL_WEBSITE)
@@ -375,7 +386,8 @@ class Conversation:
         return type(self).NORMAL
 
     async def banner_url_req_state(self):
-        if await self.check_reset(): return
+        if await self.check_reset():
+            return
         banner_url_in_db, = next(db.execute(constants.SQL_GET_SCHOOL_URL,
                                             (self.school_id,)))
         if banner_url_in_db is not None:
@@ -384,7 +396,7 @@ class Conversation:
             return type(self).NORMAL
         parse_result = urlparse(self.msg_content)
         if (parse_result.scheme.lower() not in ('http', 'https')
-            or not parse_result.netloc):
+                or not parse_result.netloc):
             await self.reply(constants.USER_MSG_INVALID_URL)
             return
         extract_result = tldextract.extract(self.msg_content)
@@ -419,7 +431,7 @@ class Conversation:
             self.state = type(self).HELLO
         else:
             self.user_id, self.school_id, self.state, self.school_name, \
-                          self.banner_base_url = result
+                self.banner_base_url = result
 
     def run_state(self):
         try:
@@ -428,7 +440,7 @@ class Conversation:
                 type(self).HELLO: self.hello_state,
                 type(self).SCHOOL_NAME_REQUEST: self.school_name_req_state,
                 type(self).BANNER_URL_REQUEST: self.banner_url_req_state,
-                }[self.state]()
+            }[self.state]()
         except KeyError:
             if self.state & type(self).RESET_CONFIRMATION:
                 return self.reset_confirm_state()
@@ -446,9 +458,11 @@ class Conversation:
             self.message = yield from client.wait_for_message(
                 author=self.author, channel=self.channel)
 
+
 @client.event
 async def on_ready():
     logger.info(constants.LOG_MSG_READY, client.user.name, client.user.id)
+
 
 @client.event
 async def on_message(message):
@@ -476,8 +490,10 @@ async def on_message(message):
             with contextlib.suppress(KeyError):
                 conversations.remove(message.author.id)
 
+
 def environ_getter(key):
     return os.environ[key.upper()]
+
 
 def main():
     global db
@@ -501,7 +517,7 @@ def main():
             'no': False,
             True: True,
             False: False,
-            }[config.color]
+        }[config.color]
         if color:
             log_format = constants.LOG_FORMAT_COLORED
         else:
@@ -528,6 +544,7 @@ def main():
         except:
             pass
         loop.close()
+
 
 if __name__ == '__main__':
     main()

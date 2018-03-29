@@ -2,15 +2,20 @@ import re
 import textwrap
 from termcolor import colored
 
+
 def unwrap(text):
     def newline_repl(match):
         newline_count = match.end() - match.start()
-        if newline_count == 1: return ' '
-        else: return '\n' * (newline_count - 1)
+        if newline_count == 1:
+            return ' '
+        else:
+            return '\n' * (newline_count - 1)
     return re.sub(r'\n+', newline_repl, textwrap.dedent(text).strip('\n'))
+
 
 def command(regex):
     return re.compile('^' + re.sub(r'\s+', r'\s+', regex) + '$', re.I)
+
 
 DESCRIPTION = 'Discord bot to watch availability of courses on Ellucian Banner'
 
@@ -19,7 +24,7 @@ CONFIG_DEFAULTS = {
     'log_level': '',
     'db_file': 'coursewatch.db',
     'seat_data_max_age': 30,
-    }
+}
 
 ARG_HELP_CONFIG_FILE = 'YAML file in which tokens are stored'
 ARG_HELP_COLOR = 'whether log output should be in color (no/auto/always)'
@@ -363,7 +368,7 @@ SQL_GET_USER_WATCHLIST = '''SELECT term, crn, name, courses.course_id AS
 
 REGEX_CLASS = (
     r'(?:(fall|autumn|spring|summer)(?: |/)(\d{4,})(?: |/)|'
-       r'(\d{4,})(?: |/)(fall|autumn|spring|summer)(?: |/)|(\d{6,})/)?(\d{5})')
+    r'(\d{4,})(?: |/)(fall|autumn|spring|summer)(?: |/)|(\d{6,})/)?(\d{5})')
 REGEX_CLASS_SEASON_GROUPS = (1, 4)
 REGEX_CLASS_YEAR_GROUPS = (2, 3)
 REGEX_CLASS_TERM_GROUPS = (5,)
@@ -384,12 +389,12 @@ BANNER_TERMS_BY_NAME = {
     'autumn': 8,
     'spring': 2,
     'summer': 5,
-    }
+}
 BANNER_TERMS_BY_NUMBER = {
     2: 'spring',
     5: 'summer',
     8: 'fall'
-    }
+}
 
 TEST_CLASS_CRN = 0
 TEST_CLASS_NAME = 'Test Class (changes every minute)'

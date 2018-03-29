@@ -18,12 +18,12 @@ setup(
         'PyYAML >=3.12, <4.0',
         'beautifulsoup4 >=4.6.0, <5.0.0',
         'humanize >=0.5.1, <0.6.0',
-        'idna==2.5', # fix version conflict
-        ],
+        'idna==2.5',  # fix version conflict
+    ],
     entry_points={
         'console_scripts': [
             'coursewatch = coursewatch.main:main',
-            ]
-        },
+        ]
+    },
     zip_safe=True
-    )
+)
