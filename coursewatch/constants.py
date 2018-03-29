@@ -143,7 +143,8 @@ USER_MSG_WATCHLIST_EMPTY = unwrap('''
     list of commands.
     ''')
 USER_MSG_WATCHLIST_ENTRY = unwrap('''
-    **{id!s} {section!s}** *{name!s}* (CRN {crn!s:0>5}, {human_term!s})
+    **{id!s} {section!s}** *{name!s}* (CRN {crn!s:0>5}, {human_term!s}):
+    {seat_rem!s}/{seat_cap!s} seat{seat_cap_plural!s} available
     ''')
 USER_MSG_INVALID_SCHOOL_WEBSITE = unwrap('''
     Hmmm, that doesn't seem like a valid website. I'm looking for
@@ -355,9 +356,10 @@ SQL_GET_USERS_TO_NOTIFY = '''SELECT discord_id FROM watchlist LEFT JOIN
                              WHERE course_id = ?'''
 SQL_GET_WATCHED_COURSES = '''SELECT DISTINCT course_id FROM watchlist'''
 SQL_GET_USER_WATCHLIST = '''SELECT term, crn, name, courses.course_id AS
-                            course_id, section FROM watchlist INNER JOIN
-                            courses ON watchlist.course_id = courses.id
-                            WHERE user_id = ?'''
+                            course_id, section, seat_cap, seat_rem FROM
+                            watchlist INNER JOIN courses ON
+                            watchlist.course_id = courses.id WHERE
+                            user_id = ?'''
 
 REGEX_CLASS = (
     r'(?:(fall|autumn|spring|summer)(?: |/)(\d{4,})(?: |/)|'

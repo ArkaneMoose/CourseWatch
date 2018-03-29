@@ -319,11 +319,14 @@ class Conversation:
         match = constants.CMD_WATCHLIST.match(self.msg_content)
         if match:
             watchlist = []
-            for term, crn, name, course_id, section in db.execute(
-                    constants.SQL_GET_USER_WATCHLIST, (self.user_id,)):
+            for term, crn, name, course_id, section, seat_cap, seat_rem \
+                    in db.execute(constants.SQL_GET_USER_WATCHLIST,
+                                  (self.user_id,)):
                 watchlist.append(constants.USER_MSG_WATCHLIST_ENTRY.format(
                     id=course_id, section=section, name=name, crn=crn,
-                    term=term, human_term=get_human_readable_term(term)))
+                    term=term, human_term=get_human_readable_term(term)),
+                    seat_cap=seat_cap, seat_rem=seat_rem,
+                    seat_cap_plural='' if seat_cap == 1 else 's')
             if watchlist:
                 lines = deque(watchlist)
                 lines.appendleft(constants.USER_MSG_WATCHLIST.format(
