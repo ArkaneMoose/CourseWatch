@@ -225,8 +225,8 @@ USER_MSG_HELP = unwrap('''
     specified by the CRN.\n
     `watch <CRN>`, `add <CRN>`, or `start watching <CRN>` will add the
     specified course to your watchlist.\n
-    `remove <CRN>`, `delete <CRN>`, or `stop watching <CRN>` will remove
-    the course from your watchlist.\n
+    `remove <CRN>`, `delete <CRN>`, `unwatch <CRN>`, or `stop watching
+    <CRN>` will remove the course from your watchlist.\n
     `list` or `watchlist` will display your current watchlist.\n
     `disclaimer` will display the disclaimer message.\n
     `help` will display this help message.
@@ -373,7 +373,7 @@ CMD_CLASS_INFO = command(REGEX_CLASS)
 CMD_CLASS_START_WATCHING = command(
     r'(?:add|watch|start watch(?:ing)?) {0!s}'.format(REGEX_CLASS))
 CMD_CLASS_STOP_WATCHING = command(
-    r'(?:remove|delete|stop watch(?:ing)?) {0!s}'.format(REGEX_CLASS))
+    r'(?:remove|delete|unwatch|stop watch(?:ing)?) {0!s}'.format(REGEX_CLASS))
 CMD_WATCHLIST = command(r'(?:my )?(?:watches|watch\s*list|list)')
 CMD_HELP = command(r'(?:help|\?)')
 CMD_DISCLAIMER = command(r'disclaimer')
