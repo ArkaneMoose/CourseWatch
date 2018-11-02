@@ -108,10 +108,10 @@ USER_MSG_CLASS_INFO = unwrap('''
     *Last updated {human_timedelta!s}*
 
     ```\n
-             |  Capacity  |   Filled   | Available  \n
-    ---------+------------+------------+------------\n
-    Seats    | {seat_cap!s:>10} | {seat_act!s:>10} | {seat_rem!s:>10} \n
-    Waitlist | {wait_cap!s:>10} | {wait_act!s:>10} | {wait_rem!s:>10} \n
+             \u2503  Capacity  \u2502   Filled   \u2502 Available  \n
+    \u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u254B\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u253F\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u253F\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\u2501\n
+    Seats    \u2503 {seat_cap!s:>10} \u2502 {seat_act!s:>10} \u2502 {seat_rem!s:>10} \n
+    Waitlist \u2503 {wait_cap!s:>10} \u2502 {wait_act!s:>10} \u2502 {wait_rem!s:>10} \n
     ```
     ''')
 USER_MSG_CLASS_NOT_FOUND = unwrap('''
