@@ -15,7 +15,7 @@ setup(
         'google-api-python-client >=1.6.2, <1.7.0',
         'termcolor >=1.1.0, <2.0.0',
         'tldextract >=2.1.0, <3.0.0',
-        'PyYAML >=3.12, <4.0',
+        'PyYAML >=3.12, <6.0',
         'beautifulsoup4 >=4.6.0, <5.0.0',
         'humanize >=0.5.1, <0.6.0',
         'idna==2.5',  # fix version conflict

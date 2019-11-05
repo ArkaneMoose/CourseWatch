@@ -2,6 +2,6 @@ discord.py==0.16.8
 termcolor==1.1.0
 google-api-python-client==1.6.2
 tldextract==2.1.0
-PyYAML==3.12
+PyYAML==5.1
 beautifulsoup4==4.6.0
 humanize==0.5.1
