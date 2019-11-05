@@ -85,7 +85,7 @@ def get_human_readable_term(term):
 
 
 def pluralize(word, num):
-    if num == 1:
+    if num != 1:
         return word + 's'
     return word
 
@@ -104,7 +104,7 @@ def dispatch_notifications(class_info):
     fmt_params = class_info._asdict()
     seat_or_waitlist = constants.MSG_PARAM_SEAT
 
-    if class_info.seat_rem == 0 and class_info.wait_cap > 0:
+    if class_info.seat_rem <= 0 and class_info.wait_cap > 0:
         fmt_params['seat_cap'] = class_info.wait_cap
         fmt_params['seat_rem'] = class_info.wait_rem
         seat_or_waitlist = constants.MSG_PARAM_WAITLIST_SPOT
@@ -171,7 +171,7 @@ async def get_class_info(school_id=None, crn=None, term=None, session=None,
                 )).lastrowid
             else:
                 notification_required = seat_rem != cached_seat_rem or (
-                    seat_rem == 0 and wait_rem != cached_wait_rem)
+                    seat_rem <= 0 and wait_rem != cached_wait_rem)
                 db.execute(constants.SQL_UPDATE_SEAT_INFO, (
                     name, course_id, section, seat_cap, seat_act, seat_rem,
                     wait_cap, wait_act, wait_rem, id_in_db))
@@ -350,7 +350,7 @@ class Conversation:
                     wait_cap, wait_rem in db.execute(
                         constants.SQL_GET_USER_WATCHLIST, (self.user_id,)):
                 seat_or_waitlist = constants.MSG_PARAM_SEAT
-                if seat_rem == 0 and wait_cap > 0:
+                if seat_rem <= 0 and wait_cap > 0:
                     seat_cap = wait_cap
                     seat_rem = wait_rem
                     seat_or_waitlist = constants.MSG_PARAM_WAITLIST_SPOT
