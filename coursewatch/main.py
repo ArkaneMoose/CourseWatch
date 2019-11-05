@@ -84,6 +84,11 @@ def get_human_readable_term(term):
     return '{season!s} {year!s}'.format(season=season, year=year)
 
 
+def pluralize(word, num):
+    if num == 1:
+        return word + 's'
+    return word
+
 async def notify(user_id, summary, description=None):
     try:
         user = users[user_id]
@@ -97,9 +102,19 @@ async def notify(user_id, summary, description=None):
 
 def dispatch_notifications(class_info):
     fmt_params = class_info._asdict()
-    fmt_params['seat_rem_plural'] = '' if class_info.seat_rem == 1 else 's'
-    fmt_params['seat_cap_plural'] = '' if class_info.seat_cap == 1 else 's'
+    seat_or_waitlist = constants.MSG_PARAM_SEAT
+
+    if class_info.seat_rem == 0 and class_info.wait_cap > 0:
+        fmt_params['seat_cap'] = class_info.wait_cap
+        fmt_params['seat_rem'] = class_info.wait_rem
+        seat_or_waitlist = constants.MSG_PARAM_WAITLIST_SPOT
+
+    fmt_params['seat_or_waitlist_cap'] = pluralize(
+        seat_or_waitlist, fmt_params['seat_cap'])
+    fmt_params['seat_or_waitlist_rem'] = pluralize(
+        seat_or_waitlist, fmt_params['seat_rem'])
     fmt_params['human_term'] = get_human_readable_term(class_info.term)
+
     summary = constants.USER_MSG_NOTIFICATION_SUMMARY.format(**fmt_params)
     description = constants.USER_MSG_NOTIFICATION_DESCRIPTION.format(
         **fmt_params)
@@ -113,6 +128,7 @@ async def get_class_info(school_id=None, crn=None, term=None, session=None,
     if term is None:
         term = banner.get_default_term()
     cached_seat_rem = None
+    cached_wait_rem = None
     notification_required = False
     try:
         if id_in_db is None:
@@ -126,6 +142,7 @@ async def get_class_info(school_id=None, crn=None, term=None, session=None,
                 seats_updated_seconds_ago = next(db.execute(
                     constants.SQL_GET_SEATS_BY_CLASS_ID, (id_in_db,)))
         cached_seat_rem = seat_rem
+        cached_wait_rem = wait_rem
         if force_refresh:
             raise ValueError('forced refresh for school ID {0!s}, term {1!s}, '
                              'CRN {2!s} (age: {3!s} seconds)'.format(
@@ -153,8 +170,8 @@ async def get_class_info(school_id=None, crn=None, term=None, session=None,
                     seat_act, seat_rem, wait_cap, wait_act, wait_rem
                 )).lastrowid
             else:
-                if seat_rem != cached_seat_rem:
-                    notification_required = True
+                notification_required = seat_rem != cached_seat_rem or (
+                    seat_rem == 0 and wait_rem != cached_wait_rem)
                 db.execute(constants.SQL_UPDATE_SEAT_INFO, (
                     name, course_id, section, seat_cap, seat_act, seat_rem,
                     wait_cap, wait_act, wait_rem, id_in_db))
@@ -329,14 +346,20 @@ class Conversation:
         match = constants.CMD_WATCHLIST.match(self.msg_content)
         if match:
             watchlist = []
-            for term, crn, name, course_id, section, seat_cap, seat_rem \
-                    in db.execute(constants.SQL_GET_USER_WATCHLIST,
-                                  (self.user_id,)):
+            for term, crn, name, course_id, section, seat_cap, seat_rem, \
+                    wait_cap, wait_rem in db.execute(
+                        constants.SQL_GET_USER_WATCHLIST, (self.user_id,)):
+                seat_or_waitlist = constants.MSG_PARAM_SEAT
+                if seat_rem == 0 and wait_cap > 0:
+                    seat_cap = wait_cap
+                    seat_rem = wait_rem
+                    seat_or_waitlist = constants.MSG_PARAM_WAITLIST_SPOT
                 watchlist.append(constants.USER_MSG_WATCHLIST_ENTRY.format(
                     id=course_id, section=section, name=name, crn=crn,
                     term=term, human_term=get_human_readable_term(term),
                     seat_cap=seat_cap, seat_rem=seat_rem,
-                    seat_cap_plural='' if seat_cap == 1 else 's'))
+                    seat_or_waitlist_cap=pluralize(seat_or_waitlist, seat_cap),
+                ))
             if watchlist:
                 lines = deque(watchlist)
                 lines.appendleft(constants.USER_MSG_WATCHLIST.format(

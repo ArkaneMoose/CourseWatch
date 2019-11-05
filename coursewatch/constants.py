@@ -149,7 +149,7 @@ USER_MSG_WATCHLIST_EMPTY = unwrap('''
     ''')
 USER_MSG_WATCHLIST_ENTRY = unwrap('''
     **{id!s} {section!s}** *{name!s}* (CRN {crn!s:0>5}, {human_term!s}):
-    **{seat_rem!s} of {seat_cap!s} seat{seat_cap_plural!s} available**
+    **{seat_rem!s} of {seat_cap!s} {seat_or_waitlist_cap!s} available**
     ''')
 USER_MSG_INVALID_SCHOOL_WEBSITE = unwrap('''
     Hmmm, that doesn't seem like a valid website. I'm looking for
@@ -258,12 +258,12 @@ USER_MSG_HELP = unwrap('''
     ''')
 USER_MSG_NOTIFICATION_SUMMARY = unwrap('''
     {id!s} {section!s}: {seat_rem!s}/{seat_cap!s}
-    seat{seat_cap_plural!s} available
+    {seat_or_waitlist_cap!s} available
     ''')
 USER_MSG_NOTIFICATION_DESCRIPTION = unwrap('''
     **{id!s} {section!s}** *{name!s}* (CRN {crn!s:0>5}, {human_term!s})
-    now has **{seat_rem!s} available seat{seat_rem_plural!s}** out of a
-    total of {seat_cap!s} seat{seat_cap_plural!s}.
+    now has **{seat_rem!s} available {seat_or_waitlist_rem!s}** out of a
+    total of {seat_cap!s} {seat_or_waitlist_cap!s}.
     ''')
 USER_MSG_CRASH = unwrap('''
     Sorry! Your session crashed unexpectedly. If you just entered a
@@ -361,8 +361,8 @@ SQL_GET_USERS_TO_NOTIFY = '''SELECT discord_id FROM watchlist LEFT JOIN
                              WHERE course_id = ?'''
 SQL_GET_WATCHED_COURSES = '''SELECT DISTINCT course_id FROM watchlist'''
 SQL_GET_USER_WATCHLIST = '''SELECT term, crn, name, courses.course_id AS
-                            course_id, section, seat_cap, seat_rem FROM
-                            watchlist INNER JOIN courses ON
+                            course_id, section, seat_cap, seat_rem, wait_cap,
+                            wait_rem FROM watchlist INNER JOIN courses ON
                             watchlist.course_id = courses.id WHERE
                             user_id = ?'''
 
@@ -395,6 +395,9 @@ BANNER_TERMS_BY_NUMBER = {
     5: 'summer',
     8: 'fall'
 }
+
+MSG_PARAM_WAITLIST_SPOT = 'waitlist spot'
+MSG_PARAM_SEAT = 'seat'
 
 TEST_CLASS_CRN = 0
 TEST_CLASS_NAME = 'Test Class (changes every minute)'
