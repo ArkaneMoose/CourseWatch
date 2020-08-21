@@ -18,6 +18,7 @@ _gapi_cse_id = None
 ClassInfo = namedtuple('ClassInfo', ('name', 'crn', 'id', 'section',
                                      'seat_cap', 'seat_act', 'seat_rem',
                                      'wait_cap', 'wait_act', 'wait_rem'))
+CalendarMonth = namedtuple('CalendarMonth', ('year', 'month'))
 
 
 class AsyncContextManagerShield:
@@ -72,16 +73,17 @@ async def test_url(url):
 
 
 def get_default_term():
-    now = datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
-    year = now.year
-    possible_terms = [datetime.datetime(year, month, 1, 0, 0, 0,
-                                        tzinfo=datetime.timezone.utc)
-                      for month in (2, 8)]
-    possible_terms.append(datetime.datetime(year + 1, 2, 1, 0, 0, 0,
-                                            tzinfo=datetime.timezone.utc))
-    term = min(filter(lambda date: date >= now, possible_terms),
-               key=lambda date: date - now)
-    return term.year * 100 + term.month
+    now = datetime.datetime.now(tz=datetime.timezone.utc)
+    this_month = CalendarMonth(now.year, now.month)
+    possible_terms = (
+        CalendarMonth(this_month.year, 2),
+        CalendarMonth(this_month.year, 8),
+        CalendarMonth(this_month.year + 1, 2),
+    )
+    return next(
+        term.year * 100 + term.month
+        for term in possible_terms if term >= this_month
+    )
 
 
 async def get_class_info(base_url, crn, term=None, session=None):
