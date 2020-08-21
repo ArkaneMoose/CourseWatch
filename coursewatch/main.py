@@ -97,7 +97,7 @@ async def notify(user_id, summary, description=None):
         users[user_id] = user
     message = await user.send(summary)
     if description is not None:
-        await message.edit(description)
+        await message.edit(content=description)
 
 
 def dispatch_notifications(class_info):
@@ -437,10 +437,10 @@ class Conversation:
                                                           self.school_id))
             logger.info(constants.LOG_MSG_BANNER_URL_MANUAL_SUCCESS,
                         self.school_name, self.banner_base_url)
-            await msg_to_edit.edit(constants.USER_MSG_URL_TEST_SUCCESS)
+            await msg_to_edit.edit(content=constants.USER_MSG_URL_TEST_SUCCESS)
             return type(self).NORMAL
         else:
-            await msg_to_edit.edit(constants.USER_MSG_URL_TEST_FAILED)
+            await msg_to_edit.edit(content=constants.USER_MSG_URL_TEST_FAILED)
 
     def __init__(self, message):
         self.message = message
