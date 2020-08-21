@@ -277,7 +277,7 @@ USER_MSG_CRASH = unwrap('''
 SQL_INITIALIZE = '''
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY,
-        discord_id TEXT UNIQUE NOT NULL,
+        discord_id INTEGER UNIQUE NOT NULL,
         school_id INTEGER,
         state INTEGER NOT NULL,
         FOREIGN KEY(school_id) REFERENCES schools(id)
