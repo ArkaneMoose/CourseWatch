@@ -4,7 +4,7 @@ from setuptools import setup
 
 setup(
     name='coursewatch',
-    version='1.2.1',
+    version='1.2.2',
     description='Discord bot to watch availability of courses on Ellucian Banner',
     author='Rishov Sarkar',
     url='https://github.com/ArkaneMoose/CourseWatch',
