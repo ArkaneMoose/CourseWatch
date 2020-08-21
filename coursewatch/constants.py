@@ -14,7 +14,7 @@ def unwrap(text):
 
 
 def command(regex):
-    return re.compile('^' + re.sub(r'\s+', r'\s+', regex) + '$', re.I)
+    return re.compile('^' + re.sub(r'\s+', r'\\s+', regex) + '$', re.I)
 
 
 DESCRIPTION = 'Discord bot to watch availability of courses on Ellucian Banner'
