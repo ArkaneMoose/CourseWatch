@@ -1,10 +1,9 @@
 import asyncio
-import aiohttp
 import bisect
 import datetime
 import operator
 import contextlib
-from . import logutil, constants
+from . import logutil, constants, http
 from collections import namedtuple
 from googleapiclient.discovery import build as gapi_build
 from urllib.parse import urljoin
@@ -67,7 +66,7 @@ async def autodiscover(school_name):
 
 async def test_url(url):
     url = urljoin(url, constants.BANNER_TEST_PATH)
-    async with aiohttp.ClientSession() as session:
+    async with http.create_aiohttp_session() as session:
         async with session.get(url, allow_redirects=False) as resp:
             return resp.status == 200
 
@@ -98,7 +97,7 @@ async def get_class_info(base_url, crn, term=None, session=None):
         if term is None:
             term = get_default_term()
         session_cm = (AsyncContextManagerShield(session)
-                      or aiohttp.ClientSession())
+                      or http.create_aiohttp_session())
         url = urljoin(base_url, constants.BANNER_DETAILS_PATH)
         params = {'term_in': str(term), 'crn_in': str(crn).rjust(5, '0')}
         async with session_cm as session:

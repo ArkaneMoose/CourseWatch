@@ -10,12 +10,11 @@ import sys
 import sqlite3
 import datetime
 import tldextract
-import aiohttp
 import yaml
 import functools
 import humanize
 import concurrent
-from . import logutil, constants, banner
+from . import logutil, constants, banner, http
 from urllib.parse import urlparse, urljoin
 from collections import namedtuple, deque
 
@@ -186,7 +185,7 @@ async def get_class_info(school_id=None, crn=None, term=None, session=None,
 
 async def watch_iteration():
     logger.debug(constants.LOG_MSG_WATCHER_LOOP_ITERATION_START)
-    async with aiohttp.ClientSession() as session:
+    async with http.create_aiohttp_session() as session:
         tasks = []
         for course_db_id, in db.execute(constants.SQL_GET_WATCHED_COURSES):
             tasks.append(asyncio.ensure_future(get_class_info(
