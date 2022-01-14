@@ -557,8 +557,8 @@ def main():
     except KeyboardInterrupt:
         pass
     finally:
-        loop.run_until_complete(client.logout())
-        pending = asyncio.Task.all_tasks(loop=loop)
+        loop.run_until_complete(client.close())
+        pending = asyncio.all_tasks(loop=loop)
         gathered = asyncio.gather(*pending, loop=loop)
         try:
             gathered.cancel()
